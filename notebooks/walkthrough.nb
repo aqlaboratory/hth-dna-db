@@ -1,0 +1,1286 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     51849,       1277]
+NotebookOptionsPosition[     49783,       1212]
+NotebookOutlinePosition[     50123,       1227]
+CellTagsIndexPosition[     50080,       1224]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[StyleBox["This notebook is a sample walk through the generation \
+of a new database from raw structures",
+ FontWeight->"Bold"]], "Text",
+ CellChangeTimes->{{3.6167032942542725`*^9, 3.6167033276643486`*^9}, {
+  3.649326574165722*^9, 3.6493265865915174`*^9}}],
+
+Cell["\<\
+First step is to structurally align the protein-DNA complexes using the \
+registration functions.\
+\>", "Text",
+ CellChangeTimes->{{3.6493267871420317`*^9, 3.6493267982213154`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Registration", "Subsubsection",
+ CellChangeTimes->{{3.422368573527167*^9, 3.4223685741990414`*^9}, {
+  3.6493270100258703`*^9, 3.6493270110554953`*^9}}],
+
+Cell["\<\
+Set symbols for list of PDB files and directory for registration outputs:\
+\>", "Text",
+ CellChangeTimes->{{3.649326905807167*^9, 3.649326976279714*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"filesPDBs", "=", 
+   RowBox[{"{", 
+    RowBox[{"\"\<file1.pdb\>\"", ",", "\"\<file2.pdb\>\""}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"fldrRegistrationPackages", "=", "\"\<RPDirectory\>\""}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"fldrRegistrations", "=", "\"\<RegistrationsDirectory\>\""}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.649326956513907*^9, 3.6493270010238094`*^9}, {
+  3.6493286935927415`*^9, 3.6493287024752016`*^9}}],
+
+Cell["\<\
+Preparing \[OpenCurlyDoubleQuote]registration \
+packages\[CloseCurlyDoubleQuote] which is an O(n) computation that prepares \
+necessary files for the actual registration step.\
+\>", "Text",
+ CellChangeTimes->{{3.649327006697237*^9, 3.649327020634548*^9}, {
+  3.6493284436785293`*^9, 3.6493284780255766`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"SetDirectory", "[", "fldrRegistrationPackages", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"osLog", "=", 
+   RowBox[{"OpenWrite", "[", "\"\<log.txt\>\"", "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"$Output", "=", 
+   RowBox[{"{", "osLog", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"$Messages", "=", 
+   RowBox[{"{", "osLog", "}"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.4111545430014*^9, 3.4111545781014*^9}, {
+  3.4111546209858*^9, 3.4111546339182*^9}, {3.4111584804107046`*^9, 
+  3.4111584812348704`*^9}, {3.422365473863944*^9, 3.422365475957694*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Block", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+     "fileHTH", ",", "chainsHTH", ",", "dnaHTH", ",", "proteinHTH", ",", 
+      "nameFileHTH", ",", "nameHTH", ",", "pkgHTH"}], "}"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Table", "[", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"fileHTH", "=", 
+        RowBox[{
+        "filesPDBs", "\[LeftDoubleBracket]", "i", "\[RightDoubleBracket]"}]}],
+        ";", "\[IndentingNewLine]", 
+       RowBox[{"nameHTH", "=", 
+        RowBox[{"StringTake", "[", 
+         RowBox[{"fileHTH", ",", "4"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"chainsHTH", "=", 
+        RowBox[{"PDBChainsImport", "[", "fileHTH", "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"pkgHTH", "=", 
+        RowBox[{"RegistrationPackage", "[", 
+         RowBox[{"nameHTH", ",", "chainsHTH"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"SetDirectory", "[", "fldrRegistrationPackages", "]"}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"Table", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"nameFileHTH", "=", 
+           RowBox[{"nameHTH", "~~", "\"\< \>\"", "~~", 
+            RowBox[{"StringReplace", "[", 
+             RowBox[{
+              RowBox[{"ToString", "[", 
+               RowBox[{"pkgHTH", "\[LeftDoubleBracket]", 
+                RowBox[{"j", ",", "3", ",", "1", ",", 
+                 RowBox[{"2", ";;", "3"}]}], "\[RightDoubleBracket]"}], "]"}],
+               ",", 
+              RowBox[{"\"\<->\>\"", "\[Rule]", "\"\<=\>\""}]}], "]"}]}]}], 
+          ";", "\[IndentingNewLine]", 
+          RowBox[{"Print", "[", "nameFileHTH", "]"}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{
+             "pkgHTH", "\[LeftDoubleBracket]", "j", "\[RightDoubleBracket]"}],
+              "=!=", 
+             RowBox[{"{", "}"}]}], ",", 
+            RowBox[{"Put", "[", 
+             RowBox[{
+              RowBox[{
+              "pkgHTH", "\[LeftDoubleBracket]", "j", 
+               "\[RightDoubleBracket]"}], ",", "nameFileHTH"}], "]"}]}], 
+           "]"}], ";"}], "\[IndentingNewLine]", "\[IndentingNewLine]", ",", 
+         RowBox[{"{", 
+          RowBox[{"j", ",", 
+           RowBox[{"Length", "[", "pkgHTH", "]"}]}], "}"}]}], "]"}]}], 
+      "\[IndentingNewLine]", "\[IndentingNewLine]", ",", 
+      RowBox[{"{", 
+       RowBox[{"i", ",", 
+        RowBox[{"Length", "[", "filesPDBs", "]"}]}], "}"}]}], "]"}]}], "]"}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.406131298367*^9, 3.4061315349709997`*^9}, {
+   3.406131604642*^9, 3.4061316047139997`*^9}, {3.406131658248*^9, 
+   3.406131710466*^9}, {3.406131770553*^9, 3.406131800282*^9}, {
+   3.406131839082*^9, 3.4061318506730003`*^9}, {3.4061318958380003`*^9, 
+   3.406131918387*^9}, {3.406131956824*^9, 3.406131960391*^9}, {
+   3.406132083639*^9, 3.40613211102*^9}, {3.406132208609*^9, 
+   3.40613223369*^9}, {3.406132764007*^9, 3.406132764065*^9}, {
+   3.406133394784*^9, 3.406133396513*^9}, {3.4061369870620003`*^9, 
+   3.406136997634*^9}, {3.406137041757*^9, 3.406137068241*^9}, {
+   3.406139107009*^9, 3.406139138142*^9}, {3.406139654138*^9, 
+   3.406139656947*^9}, {3.4061400398389997`*^9, 3.406140060553*^9}, {
+   3.406140368788*^9, 3.4061403742200003`*^9}, {3.4061413130810003`*^9, 
+   3.406141313422*^9}, {3.406141386867*^9, 3.4061413877939997`*^9}, 
+   3.406141477065*^9, {3.406141729477*^9, 3.406141781835*^9}, {
+   3.406142716474*^9, 3.40614271967*^9}, {3.4061428344779997`*^9, 
+   3.406142843454*^9}, {3.409769414915002*^9, 3.4097694161453915`*^9}, {
+   3.411152375882*^9, 3.4111523782376003`*^9}, {3.4111524315271997`*^9, 
+   3.411152488748*^9}, {3.4111525222567997`*^9, 3.4111525225688*^9}, {
+   3.4111527474174*^9, 3.4111527613014*^9}, 3.4111530326554003`*^9, {
+   3.4111530729189997`*^9, 3.4111530734494*^9}, {3.4111531297186003`*^9, 
+   3.4111531468318*^9}, {3.4111532010573997`*^9, 3.4111532013382*^9}, 
+   3.4111532633014*^9, {3.4111533432046003`*^9, 3.4111533970713997`*^9}, {
+   3.4111535776098003`*^9, 3.4111535780466003`*^9}, 3.4111539815206003`*^9, {
+   3.4111547465346003`*^9, 3.411154747689*^9}, {3.4111583889692917`*^9, 
+   3.4111583894751186`*^9}, 3.4111584675521526`*^9, {3.4111747513985915`*^9, 
+   3.411174754221653*^9}, {3.4223652814442444`*^9, 3.4223652818036194`*^9}, 
+   3.4223672386212497`*^9, {3.422367328860432*^9, 3.422367330969807*^9}, {
+   3.422367392720657*^9, 3.422367401064407*^9}, {3.4223674686112814`*^9, 
+   3.4223674956044273`*^9}, {3.6493270679333277`*^9, 3.649327073781426*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Close", "[", "osLog", "]"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"$Output", "=", 
+   RowBox[{"{", 
+    RowBox[{"Streams", "[", "\"\<stdout\>\"", "]"}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"$Messages", "=", 
+   RowBox[{"{", 
+    RowBox[{"Streams", "[", "\"\<stdout\>\"", "]"}], "}"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.4111546709526*^9, 3.411154673901*^9}, {
+  3.4111609455908136`*^9, 3.4111609457490063`*^9}, {3.4124455357869997`*^9, 
+  3.4124455398310003`*^9}}],
+
+Cell[TextData[{
+ "Performing actual registration, an ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"O", "(", 
+    SuperscriptBox["n", "2"], ")"}], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ " step:"
+}], "Text",
+ CellChangeTimes->{{3.6493285035613737`*^9, 3.649328512137314*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"filesRegistrations", "=", 
+   RowBox[{"FileNames", "[", 
+    RowBox[{"\"\<*\>\"", ",", "fldrRegistrationPackages"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"filesMatRegistrations", "=", 
+   RowBox[{"Flatten", "[", 
+    RowBox[{
+     RowBox[{"Outer", "[", 
+      RowBox[{"List", ",", "filesRegistrations", ",", "filesRegistrations"}], 
+      "]"}], ",", "1"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.4223690115661936`*^9, 3.4223690267224436`*^9}, {
+  3.6493286339225283`*^9, 3.649328671573634*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ParallelTable", "[", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Block", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "entryPair", ",", "chainsHTH", ",", "dnaHTH", ",", "proteinHTH", ",", 
+        "fileBaseHTH", ",", "fileModelHTH", ",", "nameFileReg", ",", 
+        "dbDNABaseHTH", ",", "dbDNAModelHTH"}], "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"SetDirectory", "[", "fldrRegistrationPackages", "]"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"entryPair", "=", 
+        RowBox[{
+        "filesMatRegistrations", "\[LeftDoubleBracket]", "i", 
+         "\[RightDoubleBracket]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"dbDNABaseHTH", ",", "dbDNAModelHTH"}], "}"}], "=", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"Get", "[", 
+           RowBox[{
+           "entryPair", "\[LeftDoubleBracket]", "1", 
+            "\[RightDoubleBracket]"}], "]"}], ",", 
+          RowBox[{"Get", "[", 
+           RowBox[{
+           "entryPair", "\[LeftDoubleBracket]", "2", 
+            "\[RightDoubleBracket]"}], "]"}]}], "}"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"SetDirectory", "[", "fldrRegistrations", "]"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Put", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"RegisterByDNA", "[", 
+          RowBox[{"dbDNABaseHTH", ",", "dbDNAModelHTH", ",", 
+           RowBox[{"MinOverlap", "\[Rule]", "8"}], ",", 
+           RowBox[{"MSDSeparationWarning", "\[Rule]", 
+            RowBox[{"(", 
+             RowBox[{"15000", "&"}], ")"}]}]}], "]"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{"StringJoin", "[", 
+          RowBox[{"Insert", "[", 
+           RowBox[{
+            RowBox[{
+            "filesMatRegistrations", "\[LeftDoubleBracket]", "i", 
+             "\[RightDoubleBracket]"}], ",", "\"\< \>\"", ",", "2"}], "]"}], 
+          "]"}]}], "]"}]}]}], "]"}], "\[IndentingNewLine]", 
+    "\[IndentingNewLine]", ",", 
+    RowBox[{"{", 
+     RowBox[{"i", ",", 
+      RowBox[{"Length", "[", "filesMatRegistrations", "]"}]}], "}"}]}], "]"}],
+   ";"}]], "Input",
+ CellChangeTimes->{
+  3.4223696374663467`*^9, {3.4223698544007373`*^9, 3.4223698551976123`*^9}, {
+   3.4223698995110517`*^9, 3.422369899745427*^9}, {3.4223700249133577`*^9, 
+   3.4223700267102327`*^9}, {3.422370941041089*^9, 3.422370949447339*^9}, {
+   3.4223710563143077`*^9, 3.4223710641893077`*^9}, {3.4250718020063324`*^9, 
+   3.425071804680966*^9}, {3.425235455694912*^9, 3.4252354702008195`*^9}, 
+   3.425235592080714*^9, 3.4257556077460003`*^9, {3.4257566898832383`*^9, 
+   3.425756690461364*^9}, {3.425756784259177*^9, 3.425756820134177*^9}, {
+   3.425756907868552*^9, 3.425756918524802*^9}, {3.4257569490296435`*^9, 
+   3.425756950420268*^9}, {3.4257773427166*^9, 3.4257773428496*^9}, {
+   3.6493287175085745`*^9, 3.649328720305827*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Clustering", "Subsubsection",
+ CellChangeTimes->{{3.422368573527167*^9, 3.4223685741990414`*^9}, {
+  3.6493270100258703`*^9, 3.6493270110554953`*^9}, {3.649328839977716*^9, 
+  3.649328841555952*^9}}],
+
+Cell["Obtain pairwise distances", "Text",
+ CellChangeTimes->{{3.6493289172655087`*^9, 3.6493289197971554`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"SetDirectory", "[", "fldrRegistrations", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"distMat", "=", 
+   RowBox[{"Map", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"First", "[", 
+       RowBox[{"Get", "[", 
+        RowBox[{"StringJoin", "[", 
+         RowBox[{"Insert", "[", 
+          RowBox[{"#", ",", "\"\< \>\"", ",", "2"}], "]"}], "]"}], "]"}], 
+       "]"}], "&"}], ",", "filesMatRegistrations", ",", 
+     RowBox[{"{", "2", "}"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"distSymmetrizedMat", "=", 
+   RowBox[{"MapIndexed", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Min", "[", 
+       RowBox[{"#1", ",", 
+        RowBox[{"Extract", "[", 
+         RowBox[{"distMat", ",", 
+          RowBox[{"Reverse", "[", "#2", "]"}]}], "]"}]}], "]"}], "&"}], ",", 
+     "distMat", ",", 
+     RowBox[{"{", "2", "}"}]}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{
+  3.412430494869*^9, {3.412430549701*^9, 3.412430636836*^9}, {
+   3.41243094748*^9, 3.412430983109*^9}, {3.412433660065*^9, 
+   3.412433660758*^9}, {3.4166093998900003`*^9, 3.416609403153*^9}, {
+   3.416617748296*^9, 3.416617752093*^9}, {3.417203670869*^9, 
+   3.417203673679*^9}, {3.4223864189425273`*^9, 3.4223864379581523`*^9}, {
+   3.649328939646249*^9, 3.649328967537758*^9}}],
+
+Cell["\<\
+Cluster based on distance matrix using any favorite function.\
+\>", "Text",
+ CellChangeTimes->{{3.6493289941268635`*^9, 3.6493290045208473`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"clusters", "=", 
+   RowBox[{"FavoiteClusteringFunction", "[", "distSymmetrizedMat", "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.412433009296*^9, 3.412433027049*^9}, {3.412433063118*^9,
+    3.412433082925*^9}, 3.413639805541*^9, {3.41660982035*^9, 
+   3.416609829755*^9}, {3.416617773297*^9, 3.416617774638*^9}, {
+   3.417203743278*^9, 3.4172037512939997`*^9}, {3.417389444773*^9, 
+   3.417389467007*^9}, {3.4173895338780003`*^9, 3.417389642767*^9}, {
+   3.4223871975636415`*^9, 3.4223872071730165`*^9}, {3.4224708989960003`*^9, 
+   3.4224709197469997`*^9}, 3.4256606822886*^9, 3.4344104143844*^9, {
+   3.4344110290664*^9, 3.4344110362424*^9}, {3.649329006896283*^9, 
+   3.6493290265410147`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Extraction of DNA Canonical Regions", "Subsubsection",
+ CellChangeTimes->{{3.422368573527167*^9, 3.4223685741990414`*^9}, {
+  3.6493270100258703`*^9, 3.6493270110554953`*^9}, {3.6493290784803047`*^9, 
+  3.649329082636853*^9}, {3.6493294207279415`*^9, 3.6493294210404644`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"rangeExtractionCanonicalDNAExemplar", "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "2"}], ",", "2"}], "}"}], "+", "#"}], ")"}], "&"}], "/@",
+     "\[IndentingNewLine]", 
+    RowBox[{"RangeDNAMatch", "[", 
+     RowBox[{"GetRP", "[", 
+      RowBox[{"clusters", ",", "filesRegistrations"}], "]"}], "]"}]}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.435522989908927*^9, 3.435523018113727*^9}, {
+   3.435523127360527*^9, 3.435523180244527*^9}, 3.4355243168417273`*^9, {
+   3.4355250989437275`*^9, 3.435525100550527*^9}, {3.4355324894588003`*^9, 
+   3.435532500488*^9}, {3.649329138532662*^9, 3.6493291682806225`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"rangesExtractionCanonicalDNAMembers", "=", 
+   RowBox[{"Block", "[", 
+    RowBox[{
+     RowBox[{"{", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"cluster", "=", "clusters"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"files", "=", "filesRegistrations"}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+       "rangeExemplar", "=", "rangeExtractionCanonicalDNAExemplar"}]}], "}"}],
+      ",", "\[IndentingNewLine]", 
+     RowBox[{"Map", "[", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Nest", "[", 
+         RowBox[{"Reverse", ",", 
+          RowBox[{"rangeExemplar", "+", 
+           RowBox[{
+           "#", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}]}], ",", 
+          RowBox[{
+          "#", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}]}], 
+         "]"}], "&"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"Map", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"With", "[", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"reg", "=", 
+              RowBox[{"GetReg", "[", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{
+                  "cluster", "\[LeftDoubleBracket]", "1", 
+                   "\[RightDoubleBracket]"}], ",", "#"}], "}"}], ",", 
+                "files"}], "]"}]}], "}"}], ",", "\[IndentingNewLine]", 
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"RangeInnerDNAMatch", "[", 
+                RowBox[{"reg", ",", "Model"}], "]"}], "-", 
+               RowBox[{"RangeInnerDNAMatch", "[", 
+                RowBox[{"reg", ",", "Base"}], "]"}]}], ",", 
+              RowBox[{"Boole", "[", 
+               RowBox[{"RegFlippedDNAQ", "[", "reg", "]"}], "]"}]}], "}"}]}], 
+           "]"}], "&"}], ",", "\[IndentingNewLine]", 
+         RowBox[{"Rest", "[", "cluster", "]"}]}], "]"}]}], "]"}]}], "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.429386834968*^9, 3.429386957887*^9}, {3.429387100283*^9,
+    3.429387216318*^9}, {3.429388731168*^9, 3.429388789483*^9}, {
+   3.4294681012472*^9, 3.4294681130142*^9}, 3.4294697796032*^9, {
+   3.429537229334*^9, 3.429537247718*^9}, {3.429537301342*^9, 
+   3.429537315939*^9}, {3.429537356711*^9, 3.429537371767*^9}, {
+   3.4355247971305275`*^9, 3.4355248721353273`*^9}, {3.4355249216809273`*^9, 
+   3.435524941024927*^9}, {3.4355325405488*^9, 3.4355325515156*^9}, {
+   3.6493291706089153`*^9, 3.649329191280856*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+  "rangesTruncatedExtractionCanonicalDNAMembers", "=", 
+   "rangesExtractionCanonicalDNAMembers"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Map", "[", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{
+        "rangesTruncatedExtractionCanonicalDNAMembers", 
+         "\[LeftDoubleBracket]", 
+         RowBox[{
+          RowBox[{"#", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+           ",", 
+          RowBox[{
+           RowBox[{
+           "#", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}], "/.", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"2", "\[Rule]", "1"}], ",", 
+             RowBox[{"1", "\[Rule]", "2"}]}], "}"}]}], ",", "2"}], 
+         "\[RightDoubleBracket]"}], "+=", 
+        RowBox[{
+         RowBox[{
+         "rangesTruncatedExtractionCanonicalDNAMembers", 
+          "\[LeftDoubleBracket]", 
+          RowBox[{"Sequence", "@@", "#"}], "\[RightDoubleBracket]"}], "-", 
+         "1"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{
+        "rangesTruncatedExtractionCanonicalDNAMembers", 
+         "\[LeftDoubleBracket]", 
+         RowBox[{"Sequence", "@@", "#"}], "\[RightDoubleBracket]"}], "=", 
+        "1"}]}], ")"}], "&"}], ",", "\[IndentingNewLine]", 
+    RowBox[{"Position", "[", 
+     RowBox[{"rangesTruncatedExtractionCanonicalDNAMembers", ",", 
+      RowBox[{"e_", "/;", 
+       RowBox[{"e", "\[LessEqual]", "0"}]}], ",", 
+      RowBox[{"{", "3", "}"}]}], "]"}]}], "]"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.429540025551*^9, 3.429540051158*^9}, {
+  3.4295400841879997`*^9, 3.429540143251*^9}, {3.42954023794*^9, 
+  3.429540258906*^9}, {3.4295402935039997`*^9, 3.429540330304*^9}, {
+  3.429540370635*^9, 3.429540374297*^9}, {3.4295404299370003`*^9, 
+  3.42954046781*^9}, {3.429540525758*^9, 3.429540526178*^9}, {
+  3.4355251554625273`*^9, 3.435525170516527*^9}, {3.4355325613436003`*^9, 
+  3.4355325654776*^9}, {3.4355336431879997`*^9, 3.4355336539832*^9}, {
+  3.649329212855961*^9, 3.6493292357366047`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"rangesExtractionCanonicalDNA", "=", 
+   RowBox[{"Prepend", "[", 
+    RowBox[{
+    "rangesTruncatedExtractionCanonicalDNAMembers", ",", 
+     "rangeExtractionCanonicalDNAExemplar"}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.429387258759*^9, 3.429387331903*^9}, {
+  3.4293890344960003`*^9, 3.429389052281*^9}, {3.435525189049327*^9, 
+  3.435525211310527*^9}, {3.435525247746727*^9, 3.435525269040727*^9}, {
+  3.435532576616*^9, 3.4355325891584*^9}, {3.43553367899*^9, 
+  3.4355337064616003`*^9}, {3.649329282024497*^9, 3.649329314791156*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"rangesMappingCanonicalDNAMembers", "=", 
+    RowBox[{"Block", "[", 
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"cluster", "=", "clusters"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"files", "=", "filesRegistrations"}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"rangeExemplar", "=", "rangesExtractionCanonicalDNA"}]}], 
+       "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{"Map", "[", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"rangeExemplar", "+", 
+          RowBox[{
+          "#", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}]}], 
+         "&"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"Map", "[", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"With", "[", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"{", 
+              RowBox[{"reg", "=", 
+               RowBox[{"GetReg", "[", 
+                RowBox[{
+                 RowBox[{"{", 
+                  RowBox[{
+                   RowBox[{
+                   "cluster", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], ",", "#"}], "}"}], ",", 
+                 "files"}], "]"}]}], "}"}], ",", "\[IndentingNewLine]", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"RangeInnerDNAMatch", "[", 
+                 RowBox[{"reg", ",", "Model"}], "]"}], "-", 
+                RowBox[{"RangeInnerDNAMatch", "[", 
+                 RowBox[{"reg", ",", "Base"}], "]"}]}], ",", 
+               RowBox[{"Boole", "[", 
+                RowBox[{"RegFlippedDNAQ", "[", "reg", "]"}], "]"}]}], "}"}]}],
+             "]"}], "&"}], ",", "\[IndentingNewLine]", 
+          RowBox[{"Rest", "[", "cluster", "]"}]}], "]"}]}], "]"}]}], "]"}]}], 
+   ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"rangesMappingCanonicalDNAMembers", "=", 
+    RowBox[{"Cases", "[", 
+     RowBox[{"rangesMappingCanonicalDNAMembers", ",", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"s1_", ",", "_"}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"s2_", ",", "_"}], "}"}]}], "}"}], "\[RuleDelayed]", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"1", "+", "1", "-", 
+            RowBox[{"Min", "[", 
+             RowBox[{"s1", ",", "1"}], "]"}]}], ",", 
+           RowBox[{"13", "-", "1", "+", 
+            RowBox[{"Min", "[", 
+             RowBox[{"s2", ",", "1"}], "]"}]}]}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"1", "+", "1", "-", 
+            RowBox[{"Min", "[", 
+             RowBox[{"s2", ",", "1"}], "]"}]}], ",", 
+           RowBox[{"13", "-", "1", "+", 
+            RowBox[{"Min", "[", 
+             RowBox[{"s1", ",", "1"}], "]"}]}]}], "}"}]}], "}"}]}]}], "]"}]}],
+    ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"rangesMappingCanonicalDNA", "=", 
+   RowBox[{"Prepend", "[", 
+    RowBox[{"rangesMappingCanonicalDNAMembers", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "13"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "13"}], "}"}]}], "}"}]}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.429386834968*^9, 3.429386957887*^9}, {3.429387100283*^9,
+    3.429387216318*^9}, {3.429388731168*^9, 3.429388789483*^9}, {
+   3.4294681012472*^9, 3.4294681130142*^9}, 3.4294697796032*^9, {
+   3.429537229334*^9, 3.429537247718*^9}, {3.429537301342*^9, 
+   3.429537315939*^9}, {3.429537356711*^9, 3.429537371767*^9}, {
+   3.4355247971305275`*^9, 3.4355248721353273`*^9}, {3.4355249216809273`*^9, 
+   3.435524941024927*^9}, {3.4355325405488*^9, 3.4355325515156*^9}, {
+   3.435534352988*^9, 3.4355343539863997`*^9}, {3.4355343940472*^9, 
+   3.4355343985088*^9}, {3.4355447447102003`*^9, 3.4355447493122*^9}, {
+   3.4355862632858*^9, 3.4355862792134*^9}, {3.4355928744414*^9, 
+   3.4355928951684*^9}, {3.6493293298956165`*^9, 3.6493293840504313`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Extraction of HTH Canonical Regions", "Subsubsection",
+ CellChangeTimes->{{3.4355323447474003`*^9, 3.4355323587406*^9}, {
+   3.435532599158*^9, 3.4355325998599997`*^9}, {3.4355447728838*^9, 
+   3.4355447736638002`*^9}, 3.4492428325828357`*^9, {3.649329437339229*^9, 
+   3.649329454075787*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"rangeExtractionCanonicalHTHExemplar", "=", 
+   RowBox[{"Block", "[", 
+    RowBox[{
+     RowBox[{"{", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"cluster", "=", "clusters"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"files", "=", "filesRegistrations"}]}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"RangeProteinMatch", "[", 
+      RowBox[{"GetRP", "[", 
+       RowBox[{
+        RowBox[{
+        "cluster", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+        ",", "files"}], "]"}], "]"}]}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.435586595335*^9, 3.4355865992974*^9}, {
+   3.4355876078618*^9, 3.4355876421974*^9}, {3.4355877152522*^9, 
+   3.4355877402746*^9}, {3.4355878192106*^9, 3.4355878286798*^9}, {
+   3.4355878686470003`*^9, 3.4355878708778*^9}, 3.4492428325838118`*^9, {
+   3.6493294645730724`*^9, 3.6493294756838646`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"rangesExtractionCanonicalHTHMembers", "=", 
+   RowBox[{"Block", "[", 
+    RowBox[{
+     RowBox[{"{", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"cluster", "=", "clusters"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"files", "=", "filesRegistrations"}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+       "rangeExemplar", "=", "rangeExtractionCanonicalHTHExemplar"}]}], "}"}],
+      ",", "\[IndentingNewLine]", 
+     RowBox[{"Map", "[", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"rangeExemplar", "+", "#"}], ")"}], "&"}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Map", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"With", "[", "\[IndentingNewLine]", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"reg", "=", 
+              RowBox[{"GetReg", "[", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{
+                  "cluster", "\[LeftDoubleBracket]", "1", 
+                   "\[RightDoubleBracket]"}], ",", "#"}], "}"}], ",", 
+                "files"}], "]"}]}], "}"}], ",", "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{"RangeInnerProteinMatch", "[", 
+              RowBox[{"reg", ",", "Model"}], "]"}], "-", 
+             RowBox[{"RangeInnerProteinMatch", "[", 
+              RowBox[{"reg", ",", "Base"}], "]"}]}]}], "]"}], "&"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{"Rest", "[", "cluster", "]"}]}], "]"}]}], "]"}]}], "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.429386834968*^9, 3.429386957887*^9}, {3.429387100283*^9,
+    3.429387216318*^9}, {3.4355879221862*^9, 3.435588007877*^9}, 
+   3.4492428325847883`*^9, {3.649329480482922*^9, 3.6493294969449663`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"rangesExtractionCanonical", "=", "\[IndentingNewLine]", 
+   RowBox[{"Prepend", "[", 
+    RowBox[{
+    "rangesExtractionCanonicalHTHMembers", ",", 
+     "rangeExtractionCanonicalHTHExemplar"}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.4355929516514*^9, 3.4355929631144*^9}, 
+   3.449242832585765*^9, {3.6493295029927635`*^9, 3.6493295146815853`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"rangeMappingCanonicalExemplar", "=", 
+   RowBox[{"{", 
+    RowBox[{"1", ",", 
+     RowBox[{"1", "-", 
+      RowBox[{"Subtract", "@@", "rangeExtractionCanonicalHTHExemplar"}]}]}], 
+    "}"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.435586595335*^9, 3.4355865992974*^9}, {
+   3.4355876078618*^9, 3.4355876421974*^9}, {3.4355877152522*^9, 
+   3.4355877402746*^9}, {3.4355878855886*^9, 3.4355878993322*^9}, 
+   3.4492428325867414`*^9, {3.649329524531348*^9, 3.6493295369861336`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"rangesMappingCanonical", "=", 
+    RowBox[{"Block", "[", 
+     RowBox[{
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"cluster", "=", "clusters"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"files", "=", "filesRegistrations"}]}], "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"RangeProteinMatch", "[", 
+         RowBox[{"GetRP", "[", 
+          RowBox[{"#", ",", "files"}], "]"}], "]"}], "&"}], "/@", 
+       "cluster"}]}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"rangesMappingCanonical", "=", 
+   RowBox[{"Transpose", "[", 
+    RowBox[{
+     RowBox[{"Transpose", "[", 
+      RowBox[{"(", 
+       RowBox[{"rangesMappingCanonical", "-", "rangesExtractionCanonical"}], 
+       ")"}], "]"}], "+", "rangeMappingCanonicalExemplar"}], "]"}]}], 
+  ";"}]}], "Input",
+ CellChangeTimes->{{3.4355927655954*^9, 3.4355927741144*^9}, {
+   3.4355929294884*^9, 3.4355929341524*^9}, {3.4355929812594*^9, 
+   3.4355930451633997`*^9}, 3.4492428325867414`*^9, {3.6493295469894915`*^9, 
+   3.649329590619556*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Generating Structures with Canonical Reference Frames", "Subsubsection",
+ CellChangeTimes->{{3.6493296516711044`*^9, 3.649329659679266*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"transCRFClusters", "=", 
+   RowBox[{"CanonicalTransformation", "[", 
+    RowBox[{"GetRP", "[", 
+     RowBox[{"clusters", ",", "filesRegistrations"}], "]"}], "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.428350707094*^9, 3.428350793203*^9}, {
+  3.435521047410327*^9, 3.435521105052327*^9}, {3.4526026780494413`*^9, 
+  3.452602683856687*^9}, {3.6493296697272334`*^9, 3.649329688974145*^9}}],
+
+Cell["Generating the exemplar structure:", "Text",
+ CellChangeTimes->{{3.6493297772782464`*^9, 3.649329781497529*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Block", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"cluster", "=", "clusters"}], ",", 
+      RowBox[{"files", "=", "filesFilteredDBs"}], ",", 
+      RowBox[{"fldr", "=", "fldrTransformedStructures"}], ",", 
+      RowBox[{"fldrIn", "=", "fldrStructures"}], ",", 
+      RowBox[{"rangeDNA", "=", 
+       RowBox[{"First", "[", "rangesExtractionCanonical", "]"}]}], ",", 
+      RowBox[{"transCRF", "=", "transCRFClusters"}]}], "}"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "rp", ",", "rangeHTH", ",", "chainHTH", ",", "chainDNA", ",", 
+        "chainProtein", ",", "nameChain", ",", 
+        RowBox[{"idx", "=", 
+         RowBox[{"First", "[", "cluster", "]"}]}]}], "}"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"nameChain", "=", 
+        RowBox[{"StringTake", "[", 
+         RowBox[{
+          RowBox[{
+          "filesFilteredDBs", "\[LeftDoubleBracket]", "idx", 
+           "\[RightDoubleBracket]"}], ",", "4"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"rp", "=", 
+        RowBox[{"GetRP", "[", 
+         RowBox[{"idx", ",", "files"}], "]"}]}], ";", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", 
+       RowBox[{"chainProtein", "=", 
+        RowBox[{"Cases", "[", 
+         RowBox[{
+          RowBox[{"PDBChainsImport", "[", 
+           RowBox[{
+            RowBox[{"ToFileName", "[", 
+             RowBox[{"fldrIn", ",", "nameChain"}], "]"}], "~~", 
+            "\"\<.pdb\>\""}], "]"}], ",", "_Protein"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"chainProtein", "=", 
+        RowBox[{"PDBChainsTransform", "[", 
+         RowBox[{"chainProtein", ",", "transCRF"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"rangeHTH", "=", 
+        RowBox[{"RangeProteinMatch", "[", "rp", "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"chainHTH", "=", 
+        RowBox[{"RPProtein", "[", "rp", "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{
+        "chainHTH", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+        "=", 
+        RowBox[{"chainHTH", "\[LeftDoubleBracket]", 
+         RowBox[{"1", ",", 
+          RowBox[{"Span", "@@", "rangeHTH"}]}], "\[RightDoubleBracket]"}]}], 
+       ";", "\[IndentingNewLine]", 
+       RowBox[{"chainHTH", "=", 
+        RowBox[{"PDBChainsTransform", "[", 
+         RowBox[{"chainHTH", ",", "transCRF"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"chainDNA", "=", 
+        RowBox[{"RPDNA", "[", "rp", "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"chainDNA", "\[LeftDoubleBracket]", 
+         RowBox[{"1", ",", "1"}], "\[RightDoubleBracket]"}], "=", 
+        RowBox[{"chainDNA", "\[LeftDoubleBracket]", 
+         RowBox[{"1", ",", "1", ",", 
+          RowBox[{"Span", "@@", 
+           RowBox[{
+           "rangeDNA", "\[LeftDoubleBracket]", "1", 
+            "\[RightDoubleBracket]"}]}]}], "\[RightDoubleBracket]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"chainDNA", "\[LeftDoubleBracket]", 
+         RowBox[{"2", ",", "1"}], "\[RightDoubleBracket]"}], "=", 
+        RowBox[{"chainDNA", "\[LeftDoubleBracket]", 
+         RowBox[{"2", ",", "1", ",", 
+          RowBox[{"Span", "@@", 
+           RowBox[{
+           "rangeDNA", "\[LeftDoubleBracket]", "2", 
+            "\[RightDoubleBracket]"}]}]}], "\[RightDoubleBracket]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"chainDNA", "=", 
+        RowBox[{"PDBChainsTransform", "[", 
+         RowBox[{"chainDNA", ",", "transCRF"}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"PDBChainsExport", "[", 
+        RowBox[{
+         RowBox[{"ToFileName", "[", 
+          RowBox[{"fldr", ",", 
+           RowBox[{"nameChain", "~~", "\"\< (HTH) (CRF).pdb\>\""}]}], "]"}], 
+         ",", "chainHTH"}], "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"PDBChainsExport", "[", 
+        RowBox[{
+         RowBox[{"ToFileName", "[", 
+          RowBox[{"fldr", ",", 
+           RowBox[{"nameChain", "~~", "\"\< (DNA) (CRF).pdb\>\""}]}], "]"}], 
+         ",", "chainDNA"}], "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"PDBChainsExport", "[", 
+        RowBox[{
+         RowBox[{"ToFileName", "[", 
+          RowBox[{"fldr", ",", 
+           RowBox[{"nameChain", "~~", "\"\< (CRF).pdb\>\""}]}], "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"chainHTH", ",", 
+           RowBox[{
+           "chainDNA", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+            ",", 
+           RowBox[{
+           "chainDNA", "\[LeftDoubleBracket]", "2", 
+            "\[RightDoubleBracket]"}]}], "}"}]}], "]"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"PDBChainsExport", "[", 
+        RowBox[{
+         RowBox[{"ToFileName", "[", 
+          RowBox[{"fldr", ",", 
+           RowBox[{"nameChain", "~~", "\"\< (FULL) (CRF).pdb\>\""}]}], "]"}], 
+         ",", 
+         RowBox[{"Join", "[", 
+          RowBox[{"chainProtein", ",", "chainDNA"}], "]"}]}], "]"}]}]}], 
+     "]"}]}], "]"}], ";"}]], "Input",
+ CellChangeTimes->{{3.4355937661064*^9, 3.4355938171684*^9}, {
+   3.4355938629063997`*^9, 3.4355939359144*^9}, {3.4355941603244*^9, 
+   3.4355941794364*^9}, {3.4355943314234*^9, 3.4355943493764*^9}, {
+   3.4355944202944*^9, 3.4355945216303997`*^9}, {3.4355945681804*^9, 
+   3.4355946154234*^9}, {3.4355948514444*^9, 3.4355949268664*^9}, {
+   3.4355949702014*^9, 3.4355950113324003`*^9}, {3.4355958526113997`*^9, 
+   3.4355958795914*^9}, {3.4355960601954*^9, 3.4355961145914*^9}, {
+   3.4355961648414*^9, 3.4355961732914*^9}, 3.4355962429254*^9, {
+   3.4355970770004*^9, 3.4355970773873997`*^9}, {3.45260276703691*^9, 
+   3.452602940152783*^9}, 3.452603019232682*^9, {3.452603069304673*^9, 
+   3.4526030712957563`*^9}, {3.452603473661605*^9, 3.45260347501894*^9}, {
+   3.452603597540395*^9, 3.4526036034413843`*^9}, {3.452603843483638*^9, 
+   3.4526039413406563`*^9}, {3.452611092572401*^9, 3.4526111765182*^9}, {
+   3.6493297088479147`*^9, 3.649329724474851*^9}, {3.649329767902167*^9, 
+   3.649329784513603*^9}, {3.649330201993047*^9, 3.6493302035869136`*^9}}],
+
+Cell["Generating cluster member structures:", "Text",
+ CellChangeTimes->{{3.649329843641384*^9, 3.6493298493607855`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{"fldrStructures", "=", 
+  "\"\<OriginalStructuresDirectory\>\""}], "\[IndentingNewLine]", 
+ RowBox[{"fldrTransformedStructures", "=", 
+  "\"\<NewStructuresDirectory\>\""}]}], "Input",
+ CellChangeTimes->{{3.649329888709527*^9, 3.6493299041609106`*^9}, {
+  3.6493299463166947`*^9, 3.649329952349595*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Block", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"cluster", "=", 
+       RowBox[{"Rest", "[", "clusters", "]"}]}], ",", 
+      RowBox[{"idxExemplar", "=", 
+       RowBox[{"First", "[", "clusters", "]"}]}], ",", 
+      RowBox[{"files", "=", "filesRegistrations"}], ",", 
+      RowBox[{"fldr", "=", "fldrTransformedStructures"}], ",", 
+      RowBox[{"rangesDNA", "=", 
+       RowBox[{"Rest", "[", "rangesExtractionCanonical", "]"}]}], ",", 
+      RowBox[{"transCRF", "=", "transCRFClusters"}], ",", 
+      RowBox[{"fldrIn", "=", "fldrStructures"}]}], "}"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"MapThread", "[", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"Module", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{
+          "reg", ",", "rangeHTH", ",", "chainHTH", ",", "chainDNA", ",", 
+           "chainProtein", ",", "name", ",", 
+           RowBox[{"idxMember", "=", "#1"}], ",", 
+           RowBox[{"rangeDNA", "=", "#2"}]}], "}"}], ",", 
+         "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"reg", "=", 
+           RowBox[{"GetReg", "[", 
+            RowBox[{
+             RowBox[{"{", 
+              RowBox[{"idxExemplar", ",", "idxMember"}], "}"}], ",", 
+             "files"}], "]"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"name", "=", 
+           RowBox[{"RegName", "[", "reg", "]"}]}], ";", "\[IndentingNewLine]",
+           "\[IndentingNewLine]", 
+          RowBox[{"chainProtein", "=", 
+           RowBox[{"Cases", "[", 
+            RowBox[{
+             RowBox[{"PDBChainsImport", "[", 
+              RowBox[{"ToFileName", "[", 
+               RowBox[{"fldrIn", ",", 
+                RowBox[{
+                 RowBox[{"StringTake", "[", 
+                  RowBox[{
+                   RowBox[{"RegRPName", "[", 
+                    RowBox[{"reg", ",", "Model"}], "]"}], ",", "4"}], "]"}], 
+                 "~~", "\"\<.pdb\>\""}]}], "]"}], "]"}], ",", "_Protein"}], 
+            "]"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"chainProtein", "=", 
+           RowBox[{"PDBChainsTransform", "[", 
+            RowBox[{"chainProtein", ",", 
+             RowBox[{"Composition", "[", 
+              RowBox[{"transCRF", ",", 
+               RowBox[{"RegTrans", "[", "reg", "]"}]}], "]"}]}], "]"}]}], ";",
+           "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"rangeHTH", "=", 
+           RowBox[{"RangeOuterProteinMatch", "[", 
+            RowBox[{"reg", ",", "Model"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"chainHTH", "=", 
+           RowBox[{"RegProtein", "[", 
+            RowBox[{"reg", ",", "Model"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{
+           "chainHTH", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+            "=", 
+           RowBox[{"chainHTH", "\[LeftDoubleBracket]", 
+            RowBox[{"1", ",", 
+             RowBox[{"Span", "@@", "rangeHTH"}]}], 
+            "\[RightDoubleBracket]"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"chainHTH", "=", 
+           RowBox[{"PDBChainsTransform", "[", 
+            RowBox[{"chainHTH", ",", "transCRF"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"chainDNA", "=", 
+           RowBox[{"RegDNA", "[", 
+            RowBox[{"reg", ",", "Model"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"chainDNA", "\[LeftDoubleBracket]", 
+            RowBox[{"1", ",", "1"}], "\[RightDoubleBracket]"}], "=", 
+           RowBox[{"chainDNA", "\[LeftDoubleBracket]", 
+            RowBox[{"1", ",", "1", ",", 
+             RowBox[{"Span", "@@", 
+              RowBox[{
+              "rangeDNA", "\[LeftDoubleBracket]", "1", 
+               "\[RightDoubleBracket]"}]}]}], "\[RightDoubleBracket]"}]}], 
+          ";", "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"chainDNA", "\[LeftDoubleBracket]", 
+            RowBox[{"2", ",", "1"}], "\[RightDoubleBracket]"}], "=", 
+           RowBox[{"chainDNA", "\[LeftDoubleBracket]", 
+            RowBox[{"2", ",", "1", ",", 
+             RowBox[{"Span", "@@", 
+              RowBox[{
+              "rangeDNA", "\[LeftDoubleBracket]", "2", 
+               "\[RightDoubleBracket]"}]}]}], "\[RightDoubleBracket]"}]}], 
+          ";", "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{"RegFlippedDNAQ", "[", "reg", "]"}], ",", 
+            RowBox[{"chainDNA", "=", 
+             RowBox[{"Reverse", "[", "chainDNA", "]"}]}]}], "]"}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"chainDNA", "=", 
+           RowBox[{"PDBChainsTransform", "[", 
+            RowBox[{"chainDNA", ",", "transCRF"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"PDBChainsExport", "[", 
+           RowBox[{
+            RowBox[{"ToFileName", "[", 
+             RowBox[{"fldr", ",", 
+              RowBox[{"name", "~~", "\"\< (HTH) (CRF).pdb\>\""}]}], "]"}], 
+            ",", "chainHTH"}], "]"}], ";", "\[IndentingNewLine]", 
+          RowBox[{"PDBChainsExport", "[", 
+           RowBox[{
+            RowBox[{"ToFileName", "[", 
+             RowBox[{"fldr", ",", 
+              RowBox[{"name", "~~", "\"\< (DNA) (CRF).pdb\>\""}]}], "]"}], 
+            ",", "chainDNA"}], "]"}], ";", "\[IndentingNewLine]", 
+          RowBox[{"PDBChainsExport", "[", 
+           RowBox[{
+            RowBox[{"ToFileName", "[", 
+             RowBox[{"fldr", ",", 
+              RowBox[{"name", "~~", "\"\< (CRF).pdb\>\""}]}], "]"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"chainHTH", ",", 
+              RowBox[{
+              "chainDNA", "\[LeftDoubleBracket]", "1", 
+               "\[RightDoubleBracket]"}], ",", 
+              RowBox[{
+              "chainDNA", "\[LeftDoubleBracket]", "2", 
+               "\[RightDoubleBracket]"}]}], "}"}]}], "]"}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"PDBChainsExport", "[", 
+           RowBox[{
+            RowBox[{"ToFileName", "[", 
+             RowBox[{"fldr", ",", 
+              RowBox[{"name", "~~", "\"\< (FULL) (CRF).pdb\>\""}]}], "]"}], 
+            ",", 
+            RowBox[{"Join", "[", 
+             RowBox[{"chainProtein", ",", "chainDNA"}], "]"}]}], "]"}]}]}], 
+        "]"}], "&"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"cluster", ",", "rangesDNA"}], "}"}]}], "]"}]}], "]"}], 
+  ";"}]], "Input",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGCQBGIQvTD9MMuDGS8dO5JVuUG0FeNdARB9xOmvJIiuSeQy
+A9F/v+VagOi6nlxvEF3BvcYXRO/K7gwD0TY6Jskg+tpR1kyIurd5ILrNIq8H
+RPfsvD0VRN8rdJsNotkWZy0A0dMmTOZ8CKQPvPnEA6J3OLQpQ/hBWiA6h/Oq
+Hojm8+d2B9F5JjMCQPTiSXGJILphe0n6Q7B578C0TM3JbBAtFWiXC6JNZm+f
+HrgT6F6eI0tA9NWoHytAdFv3tlUg2mTu62MgWjvY4jSIlspYuzUESM8N37wd
+RF/mL98Noq22WO0D0ZlKVYdAdNzDqFMgOvva+ksg+uqZH1dA9INtb++DaEVH
+n4cgusyt2jYUSM9jl7UH0a8kPCK7DV47vjA8Fg2iHxiJJYDoGtnNKSAaAEXa
+2v8=
+  "]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Generating aligned DNA sequences and PWMs", "Subsubsection",
+ CellChangeTimes->{{3.6493300403521156`*^9, 3.649330044961941*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"seqExemplar", "=", 
+   RowBox[{"Block", "[", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"idxExemplar", "=", 
+        RowBox[{"First", "[", "clusters", "]"}]}], ",", 
+       RowBox[{"fldr", "=", "fldrTransformedStructures"}], ",", 
+       RowBox[{"files", "=", "filesRegistrations"}], ",", "name"}], "}"}], 
+     ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"name", "=", 
+       RowBox[{"StringTake", "[", 
+        RowBox[{
+         RowBox[{
+         "filesFilteredDBs", "\[LeftDoubleBracket]", "idxExemplar", 
+          "\[RightDoubleBracket]"}], ",", "4"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"StringJoin", "[", 
+       RowBox[{"StringTake", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"PDBChainsImport", "[", 
+           RowBox[{"ToFileName", "[", 
+            RowBox[{"fldr", ",", 
+             RowBox[{"name", "~~", "\"\< (DNA) (CRF).pdb\>\""}]}], "]"}], 
+           "]"}], "\[LeftDoubleBracket]", 
+          RowBox[{"1", ",", "1", ",", "All", ",", "1"}], 
+          "\[RightDoubleBracket]"}], ",", 
+         RowBox[{"-", "1"}]}], "]"}], "]"}]}]}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.435607847363*^9, 3.435607911234*^9}, {3.435607991417*^9,
+   3.4356079981689997`*^9}, {3.43560838509*^9, 3.4356084085690002`*^9}, {
+  3.6493300530959234`*^9, 3.6493300710396323`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"seqsMembers", "=", 
+   RowBox[{"Block", "[", 
+    RowBox[{
+     RowBox[{"{", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"idxExemplar", "=", 
+        RowBox[{"First", "[", "clusters", "]"}]}], ",", 
+       RowBox[{"fldr", "=", "fldrTransformedStructures"}], ",", 
+       RowBox[{"cluster", "=", 
+        RowBox[{"Rest", "[", "clusters", "]"}]}], ",", 
+       RowBox[{"files", "=", "filesRegistrations"}], ",", "name", ",", 
+       "reg"}], "}"}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"(", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"reg", "=", 
+          RowBox[{"GetReg", "[", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"idxExemplar", ",", "#"}], "}"}], ",", 
+            "filesRegistrations"}], "]"}]}], ";", "\[IndentingNewLine]", 
+         RowBox[{"name", "=", 
+          RowBox[{"RegName", "[", "reg", "]"}]}], ";", "\[IndentingNewLine]", 
+         RowBox[{"StringJoin", "[", 
+          RowBox[{"StringTake", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"PDBChainsImport", "[", 
+              RowBox[{"ToFileName", "[", 
+               RowBox[{"fldr", ",", 
+                RowBox[{"name", "~~", "\"\< (DNA) (CRF).pdb\>\""}]}], "]"}], 
+              "]"}], "\[LeftDoubleBracket]", 
+             RowBox[{"1", ",", "1", ",", "All", ",", "1"}], 
+             "\[RightDoubleBracket]"}], ",", 
+            RowBox[{"-", "1"}]}], "]"}], "]"}]}], ")"}], "&"}], "/@", 
+      "cluster"}]}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.435607847363*^9, 3.435607982249*^9}, {3.435608016916*^9,
+   3.435608054502*^9}, {3.435608454832*^9, 3.435608462241*^9}, {
+  3.6493300800105577`*^9, 3.6493300974544353`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"seqsDNA", "=", 
+   RowBox[{"Prepend", "[", 
+    RowBox[{"seqsMembers", ",", "seqExemplar"}], "]"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.435609252532*^9, 3.435609286866*^9}, {
+  3.649330105613497*^9, 3.6493301135523605`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"seqsWithPadsDNA", "=", 
+   RowBox[{"Block", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"ranges", "=", "rangesMappingCanonical"}], ",", 
+       RowBox[{"range", "=", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "13"}], "}"}]}], ",", 
+       RowBox[{"seqs", "=", "seqsDNA"}], ",", "pads"}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"pads", "=", 
+       RowBox[{"Map", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"StringJoin", "[", 
+           RowBox[{"ConstantArray", "[", 
+            RowBox[{"\"\<X\>\"", ",", "#"}], "]"}], "]"}], "&"}], ",", 
+         RowBox[{"Abs", "[", 
+          RowBox[{"Transpose", "[", 
+           RowBox[{
+            RowBox[{"Transpose", "[", 
+             RowBox[{"ranges", "\[LeftDoubleBracket]", 
+              RowBox[{"All", ",", "1"}], "\[RightDoubleBracket]"}], "]"}], 
+            "-", "range"}], "]"}], "]"}], ",", 
+         RowBox[{"{", "2", "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"MapThread", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Insert", "[", 
+          RowBox[{"#2", ",", "#1", ",", "2"}], "]"}], "&"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"seqs", ",", "pads"}], "}"}]}], "]"}]}]}], "]"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.4356091758640003`*^9, 3.435609219061*^9}, {
+  3.435609301365*^9, 3.435609394586*^9}, {3.435610126863*^9, 
+  3.4356101458459997`*^9}, {3.649330126620002*^9, 3.6493301517296066`*^9}}]
+}, Open  ]]
+},
+WindowSize->{1440, 784},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"10.2 for Microsoft Windows (64-bit) (July 7, 2015)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 271, 4, 30, "Text"],
+Cell[832, 26, 191, 4, 30, "Text"],
+Cell[CellGroupData[{
+Cell[1048, 34, 158, 2, 39, "Subsubsection"],
+Cell[1209, 38, 163, 3, 30, "Text"],
+Cell[1375, 43, 510, 13, 72, "Input"],
+Cell[1888, 58, 318, 6, 30, "Text"],
+Cell[2209, 66, 649, 16, 92, "Input"],
+Cell[2861, 84, 4678, 93, 332, "Input"],
+Cell[7542, 179, 548, 14, 72, "Input"],
+Cell[8093, 195, 283, 9, 35, "Text"],
+Cell[8379, 206, 567, 14, 52, "Input"],
+Cell[8949, 222, 2980, 66, 252, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11966, 293, 205, 3, 39, "Subsubsection"],
+Cell[12174, 298, 111, 1, 30, "Text"],
+Cell[12288, 301, 1323, 34, 72, "Input"],
+Cell[13614, 337, 155, 3, 30, "Text"],
+Cell[13772, 342, 737, 13, 31, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14546, 360, 282, 3, 39, "Subsubsection"],
+Cell[14831, 365, 729, 18, 52, "Input"],
+Cell[15563, 385, 2565, 58, 232, "Input"],
+Cell[18131, 445, 2118, 50, 112, "Input"],
+Cell[20252, 497, 582, 11, 31, "Input"],
+Cell[20837, 510, 4140, 98, 332, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[25014, 613, 299, 4, 39, "Subsubsection"],
+Cell[25316, 619, 912, 20, 92, "Input"],
+Cell[26231, 641, 1846, 44, 232, "Input"],
+Cell[28080, 687, 391, 8, 52, "Input"],
+Cell[28474, 697, 515, 11, 31, "Input"],
+Cell[28992, 710, 1165, 30, 132, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[30194, 745, 146, 1, 39, "Subsubsection"],
+Cell[30343, 748, 428, 9, 31, "Input"],
+Cell[30774, 759, 118, 1, 30, "Text"],
+Cell[30895, 762, 6287, 140, 472, "Input"],
+Cell[37185, 904, 121, 1, 30, "Text"],
+Cell[37309, 907, 326, 6, 52, "Input"],
+Cell[37638, 915, 6983, 160, 512, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[44658, 1080, 134, 1, 39, "Subsubsection"],
+Cell[44795, 1083, 1435, 34, 112, "Input"],
+Cell[46233, 1119, 1751, 41, 132, "Input"],
+Cell[47987, 1162, 264, 6, 31, "Input"],
+Cell[48254, 1170, 1513, 39, 72, "Input"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
